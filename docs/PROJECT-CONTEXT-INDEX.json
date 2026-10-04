@@ -1,0 +1,45 @@
+﻿{
+  "projectName": "Premium Fast-Food Restaurant Ordering & Brand Website",
+  "version": "1.0.0",
+  "baselineDate": "2026-10-04",
+  "status": "INGESTED_BASELINE",
+  "authoritativeInputs": [
+    "docs/customer-input/01-PRD.md",
+    "docs/customer-input/02-Architecture-and-Design.md",
+    "docs/customer-input/03-Backend-Schema.md",
+    "docs/customer-input/04-UI-UX.md",
+    "docs/customer-input/05-TRD.md",
+    "docs/customer-input/06-App-Flow.md",
+    "docs/customer-input/07-Implementation-Plan.md"
+  ],
+  "governance": {
+    "sourceRegister": "docs/CUSTOMER-SOURCE-REGISTER.md",
+    "artifactMap": "docs/CUSTOMER-ARTIFACT-MAP.md",
+    "baseline": "docs/FACTORY_BASELINE.md",
+    "riskProfile": "docs/PROJECT-RISK-PROFILE.md",
+    "assumptions": "docs/ASSUMPTIONS.md",
+    "invariants": "docs/INVARIANTS.md",
+    "featureRegistry": "docs/FEATURE-REGISTRY.md",
+    "changeLedger": "docs/CHANGE-LEDGER.md"
+  },
+  "boundedModules": [
+    "Catalog",
+    "Pricing",
+    "Promotions",
+    "Ordering",
+    "Delivery",
+    "Payments",
+    "Customers",
+    "Content",
+    "Operations"
+  ],
+  "runtimeStack": {
+    "framework": "Next.js 16.x App Router",
+    "ui": "React 19.x + Tailwind CSS",
+    "language": "TypeScript 5.x Strict Mode",
+    "database": "PostgreSQL 18.x with Drizzle ORM",
+    "cache": "Redis / in-memory adapter",
+    "motionAnd3D": "GSAP ScrollTrigger + Three.js / React Three Fiber",
+    "testing": "Vitest (unit/integration) + Playwright (E2E/A11y/Visual)"
+  }
+}
