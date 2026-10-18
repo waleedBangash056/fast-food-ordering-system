@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --ink: #0D0F12;
+    --surface-dark: #12151B;
+    --surface-card: #1A1E26;
+    --surface-glass: rgba(18, 21, 27, 0.75);
+    --surface-glass-strong: rgba(18, 21, 27, 0.90);
+    --cream: #FFF8EE;
+    --cream-muted: #D8D2C7;
+    --accent-red: #D72638;
+    --accent-red-hover: #BF1E2F;
+    --accent-orange: #FF6B35;
+    --accent-yellow: #FFC043;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
+    --border-glass: rgba(255, 255, 255, 0.12);
+    --border-glass-strong: rgba(255, 255, 255, 0.24);
+  }
+
+  body {
+    background-color: var(--ink);
+    color: var(--cream);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.glass-panel {
+  background-color: var(--surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-panel-strong {
+  background-color: var(--surface-glass-strong);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-panel,
+  .glass-panel-strong {
+    background-color: var(--surface-dark) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
