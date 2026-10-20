@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,38 +22,95 @@ export function Dialog({
   children,
   className,
 }: DialogProps) {
+  const [mounted, setMounted] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen || !mounted) return;
+
+    // Capture the trigger element that was active before opening
+    previousActiveElement.current = document.activeElement as HTMLElement | null;
+
+    // Lock body scrolling
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    // Set initial focus to the dialog surface or first focusable child
+    const focusTimer = setTimeout(() => {
+      if (dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+        } else {
+          dialogRef.current.focus();
+        }
+      }
+    }, 10);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.stopPropagation();
         onClose();
+        return;
+      }
+
+      // WAI-ARIA Focus Trap: Tab and Shift+Tab wrap-around
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement || document.activeElement === dialogRef.current) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-      dialogRef.current?.focus();
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = "unset";
+      clearTimeout(focusTimer);
+      document.body.style.overflow = originalOverflow || "unset";
       window.removeEventListener("keydown", handleKeyDown);
+
+      // Restore focus to previous active element on close
+      if (previousActiveElement.current && typeof previousActiveElement.current.focus === "function") {
+        previousActiveElement.current.focus();
+      }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, mounted, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const dialogContent = (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"
       aria-describedby={description ? "dialog-desc" : undefined}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
     >
       {/* Backdrop */}
       <div
@@ -65,6 +123,7 @@ export function Dialog({
       <div
         ref={dialogRef}
         tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
         className={cn(
           "relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl glass-panel-strong p-6 sm:p-8 shadow-2xl text-[var(--cream)] border border-[var(--border-glass-strong)] focus:outline-none",
           className
@@ -94,4 +153,7 @@ export function Dialog({
       </div>
     </div>
   );
+
+  return createPortal(dialogContent, document.body);
 }
+
